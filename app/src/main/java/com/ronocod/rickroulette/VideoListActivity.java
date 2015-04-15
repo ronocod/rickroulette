@@ -1,8 +1,11 @@
 package com.ronocod.rickroulette;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+
+import com.ronocod.rickroulette.data.VideoContract;
 
 
 /**
@@ -18,17 +21,17 @@ import android.support.v4.app.FragmentActivity;
  * (if present) is a {@link VideoDetailFragment}.
  * <p/>
  * This activity also implements the required
- * {@link VideoListFragment.Callbacks} interface
+ * {@link VideoListFragment.Listener} interface
  * to listen for item selections.
  */
 public class VideoListActivity extends FragmentActivity
-        implements VideoListFragment.Callbacks {
+        implements VideoListFragment.Listener {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
-    private boolean mTwoPane;
+    private boolean useTwoPanes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,41 +43,32 @@ public class VideoListActivity extends FragmentActivity
             // large-screen layouts (res/values-large and
             // res/values-sw600dp). If this view is present, then the
             // activity should be in two-pane mode.
-            mTwoPane = true;
-
-            // In two-pane mode, list items should be given the
-            // 'activated' state when touched.
-            ((VideoListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.video_list))
-                    .setActivateOnItemClick(true);
+            useTwoPanes = true;
         }
 
         // TODO: If exposing deep links into your app, handle intents here.
     }
 
     /**
-     * Callback method from {@link VideoListFragment.Callbacks}
+     * Callback method from {@link VideoListFragment.Listener}
      * indicating that the item with the given ID was selected.
      */
     @Override
-    public void onItemSelected(String id) {
-        if (mTwoPane) {
+    public void onVideoSelected(long id) {
+        Uri uri = VideoContract.VideoSchema.buildUri(id);
+        if (useTwoPanes) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putString(VideoDetailFragment.ARG_ITEM_ID, id);
-            VideoDetailFragment fragment = new VideoDetailFragment();
-            fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.video_detail_container, fragment)
+                    .replace(R.id.video_detail_container, VideoDetailFragment.create(uri))
                     .commit();
 
         } else {
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
             Intent detailIntent = new Intent(this, VideoDetailActivity.class);
-            detailIntent.putExtra(VideoDetailFragment.ARG_ITEM_ID, id);
+            detailIntent.putExtra(VideoDetailFragment.KEY_URI, uri);
             startActivity(detailIntent);
         }
     }

@@ -1,9 +1,10 @@
 package com.ronocod.rickroulette;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
 
@@ -38,13 +39,9 @@ public class VideoDetailActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putString(VideoDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(VideoDetailFragment.ARG_ITEM_ID));
-            VideoDetailFragment fragment = new VideoDetailFragment();
-            fragment.setArguments(arguments);
+            Uri uri = getIntent().getParcelableExtra(VideoDetailFragment.KEY_URI);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.video_detail_container, fragment)
+                    .add(R.id.video_detail_container, VideoDetailFragment.create(uri))
                     .commit();
         }
     }

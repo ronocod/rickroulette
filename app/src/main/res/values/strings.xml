@@ -1,4 +1,7 @@
 <resources>
   <string name="app_name">RickRoulette</string>
   <string name="title_video_detail">Video Detail</string>
+
+  <string name="sync_account_type" >rickroulette.ronocod.com</string>
+  <string name="content_authority" >com.ronocod.rickroulette</string>
 </resources>
