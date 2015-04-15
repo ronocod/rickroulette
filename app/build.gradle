@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def storePass = properties.getProperty('storePass')
+def keyPass = properties.getProperty('keyPass')
+def youtubeKey = properties.getProperty('youtubeKey')
+
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
@@ -10,6 +16,8 @@ android {
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+
+        buildConfigField "String", "YOUTUBE_KEY", "\"${youtubeKey}\""
     }
 
     buildTypes {
@@ -20,10 +28,6 @@ android {
     }
 
     signingConfigs {
-        Properties properties = new Properties()
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        def storePass = properties.getProperty('storePass')
-        def keyPass = properties.getProperty('keyPass')
         release {
             storeFile file("play_store.jks")
             storePassword storePass

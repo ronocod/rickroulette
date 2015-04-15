@@ -22,6 +22,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
+import com.ronocod.rickroulette.BuildConfig;
 import com.ronocod.rickroulette.R;
 import com.ronocod.rickroulette.VideoListActivity;
 import com.ronocod.rickroulette.data.VideoContract;
@@ -149,9 +150,6 @@ public class RickSyncAdapter extends AbstractThreadedSyncAdapter {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
-        // Will contain the raw JSON response as a string.
-        String jsonString;
-
         try {
 
             final String YOUTUBE_BASE_URL =
@@ -163,7 +161,7 @@ public class RickSyncAdapter extends AbstractThreadedSyncAdapter {
             Uri builtUri = Uri.parse(YOUTUBE_BASE_URL).buildUpon()
                     .appendQueryParameter(PARAM_PART, "id,snippet")
                     .appendQueryParameter(PARAM_CHART, "mostPopular")
-                    .appendQueryParameter(PARAM_KEY, "AIzaSyAnEZedP5VgcD6i_M5q80RwsfMoDVEO8aI")
+                    .appendQueryParameter(PARAM_KEY, BuildConfig.YOUTUBE_KEY)
                     .build();
 
             URL url = new URL(builtUri.toString());
@@ -201,7 +199,9 @@ public class RickSyncAdapter extends AbstractThreadedSyncAdapter {
                 // Stream was empty.  No point in parsing.
                 return;
             }
-            jsonString = buffer.toString();
+
+            String jsonString = buffer.toString();
+            Log.d(LOG_TAG, "JSON: " + jsonString);
             parseJsonString(jsonString);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
