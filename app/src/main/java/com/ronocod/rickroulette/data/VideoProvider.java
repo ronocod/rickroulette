@@ -26,6 +26,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.ronocod.rickroulette.data.VideoContract.VideoSchema;
+
 public class VideoProvider extends ContentProvider {
 
     static final int VIDEO = 100;
@@ -33,9 +35,13 @@ public class VideoProvider extends ContentProvider {
     // The URI Matcher used by this content provider.
     private static final UriMatcher URI_MATCHER = buildUriMatcher();
     private static final SQLiteQueryBuilder QUERY_BUILDER = new SQLiteQueryBuilder();
+
+    static {
+        QUERY_BUILDER.setTables(VideoSchema.TABLE_NAME);
+    }
+
     private static final String VIDEO_ID_SELECTION =
-            VideoContract.VideoSchema.TABLE_NAME +
-                    "." + VideoContract.VideoSchema.COLUMN_VIDEO_ID + " = ? ";
+            VideoSchema.TABLE_NAME + "." + VideoSchema._ID + " = ? ";
     private VideoDbHelper dbHelper;
 
     static UriMatcher buildUriMatcher() {
@@ -44,6 +50,7 @@ public class VideoProvider extends ContentProvider {
 
         String authority = VideoContract.CONTENT_AUTHORITY;
         matcher.addURI(authority, VideoContract.PATH_VIDEO, VIDEO);
+        matcher.addURI(authority, VideoContract.PATH_VIDEO + "/#", VIDEO_WITH_ID);
 
         return matcher;
     }
@@ -79,7 +86,7 @@ public class VideoProvider extends ContentProvider {
         switch (match) {
             case VIDEO:
             case VIDEO_WITH_ID:
-                return VideoContract.VideoSchema.CONTENT_TYPE;
+                return VideoSchema.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -95,7 +102,7 @@ public class VideoProvider extends ContentProvider {
             // "video"
             case VIDEO: {
                 retCursor = dbHelper.getReadableDatabase().query(
-                        VideoContract.VideoSchema.TABLE_NAME,
+                        VideoSchema.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -127,9 +134,9 @@ public class VideoProvider extends ContentProvider {
 
         switch (match) {
             case VIDEO: {
-                long _id = db.insert(VideoContract.VideoSchema.TABLE_NAME, null, values);
+                long _id = db.insert(VideoSchema.TABLE_NAME, null, values);
                 if (_id > 0) {
-                    returnUri = VideoContract.VideoSchema.buildUri(_id);
+                    returnUri = VideoSchema.buildUri(_id);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
@@ -150,7 +157,7 @@ public class VideoProvider extends ContentProvider {
 
         switch (match) {
             case VIDEO: {
-                rowsDeleted = db.delete(VideoContract.VideoSchema.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(VideoSchema.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             default:
@@ -174,7 +181,7 @@ public class VideoProvider extends ContentProvider {
 
         switch (match) {
             case VIDEO: {
-                rowsUpdated = db.update(VideoContract.VideoSchema.TABLE_NAME, values, selection, selectionArgs);
+                rowsUpdated = db.update(VideoSchema.TABLE_NAME, values, selection, selectionArgs);
                 break;
             }
             default:
@@ -197,7 +204,7 @@ public class VideoProvider extends ContentProvider {
                 int returnCount = 0;
                 try {
                     for (ContentValues value : values) {
-                        long _id = db.insert(VideoContract.VideoSchema.TABLE_NAME, null, value);
+                        long _id = db.insert(VideoSchema.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
                         }

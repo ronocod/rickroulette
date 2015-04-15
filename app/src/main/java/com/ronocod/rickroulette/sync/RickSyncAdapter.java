@@ -156,11 +156,13 @@ public class RickSyncAdapter extends AbstractThreadedSyncAdapter {
                     "https://www.googleapis.com/youtube/v3/videos?";
             final String PARAM_PART = "part";
             final String PARAM_CHART = "chart";
+            final String PARAM_MAX_RESULTS = "maxResults";
             final String PARAM_KEY = "key";
 
             Uri builtUri = Uri.parse(YOUTUBE_BASE_URL).buildUpon()
                     .appendQueryParameter(PARAM_PART, "id,snippet")
                     .appendQueryParameter(PARAM_CHART, "mostPopular")
+                    .appendQueryParameter(PARAM_MAX_RESULTS, "25")
                     .appendQueryParameter(PARAM_KEY, BuildConfig.YOUTUBE_KEY)
                     .build();
 
@@ -248,7 +250,8 @@ public class RickSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // add to database
             if (videoValuesVector.size() > 0) {
-                ContentValues[] rows = (ContentValues[]) videoValuesVector.toArray();
+                ContentValues[] rows = new ContentValues[videoValuesVector.size()];
+                videoValuesVector.toArray(rows);
                 ContentResolver resolver = getContext().getContentResolver();
                 resolver.delete(VideoContract.VideoSchema.CONTENT_URI, null, null);
                 resolver.bulkInsert(VideoContract.VideoSchema.CONTENT_URI, rows);
