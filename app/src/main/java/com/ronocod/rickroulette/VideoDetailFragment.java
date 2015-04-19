@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.ronocod.rickroulette.data.VideoContract.VideoSchema;
@@ -30,10 +31,13 @@ import com.ronocod.rickroulette.data.VideoContract.VideoSchema;
 public class VideoDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String KEY_URI = "KEY_URI";
     private static final int LOADER_ID = 1;
+    private static final String RICK_ROLL_ID = "dQw4w9WgXcQ";
+    private static final float RICK_ROLL_CHANCE = 1f / 6f;
 
     private Uri uri;
     private TextView titleText;
     private ShareActionProvider shareActionProvider;
+    private Button watchButton;
 
     public VideoDetailFragment() {
     }
@@ -73,7 +77,9 @@ public class VideoDetailFragment extends Fragment implements LoaderManager.Loade
         View rootView = inflater.inflate(R.layout.fragment_video_detail, container, false);
 
         // Show the dummy content as text in a TextView.
-        titleText = (TextView) rootView.findViewById(R.id.video_detail);
+        titleText = (TextView) rootView.findViewById(R.id.video_detail_text);
+
+        watchButton = (Button) rootView.findViewById(R.id.video_watch_button);
 
         return rootView;
     }
@@ -113,6 +119,20 @@ public class VideoDetailFragment extends Fragment implements LoaderManager.Loade
         String title = data.getString(data.getColumnIndex(VideoSchema.COLUMN_TITLE));
         titleText.setText(title);
 
+        final String id;
+        if (Math.random() < RICK_ROLL_CHANCE) {
+            id = RICK_ROLL_ID;
+        } else {
+            id = data.getString(data.getColumnIndex(VideoSchema.COLUMN_VIDEO_ID));
+        }
+        watchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.parse("http://www.youtube.com/watch?v=" + id);
+                startActivity(new Intent(Intent.ACTION_VIEW, uri));
+            }
+        });
+
         // Attach an intent to this ShareActionProvider.  You can update this at any time,
         // like when the user selects a new piece of data they might like to share.
         if (shareActionProvider != null) {
@@ -124,7 +144,6 @@ public class VideoDetailFragment extends Fragment implements LoaderManager.Loade
 
     private Intent createShareIntent(String title) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, title + " #RickRoulette");
         return shareIntent;
@@ -134,5 +153,6 @@ public class VideoDetailFragment extends Fragment implements LoaderManager.Loade
     public void onLoaderReset(Loader<Cursor> loader) {
 
         titleText.setText("No Video");
+        watchButton.setOnClickListener(null);
     }
 }

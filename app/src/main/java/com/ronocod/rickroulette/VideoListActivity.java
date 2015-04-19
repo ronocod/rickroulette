@@ -3,9 +3,10 @@ package com.ronocod.rickroulette;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 
 import com.ronocod.rickroulette.data.VideoContract;
+import com.ronocod.rickroulette.sync.RickSyncAdapter;
 
 
 /**
@@ -24,7 +25,7 @@ import com.ronocod.rickroulette.data.VideoContract;
  * {@link VideoListFragment.Listener} interface
  * to listen for item selections.
  */
-public class VideoListActivity extends FragmentActivity
+public class VideoListActivity extends ActionBarActivity
         implements VideoListFragment.Listener {
 
     /**
@@ -46,7 +47,10 @@ public class VideoListActivity extends FragmentActivity
             useTwoPanes = true;
         }
 
-        // TODO: If exposing deep links into your app, handle intents here.
+
+        getSupportActionBar().setElevation(0f);
+
+        RickSyncAdapter.initializeSyncAdapter(this);
     }
 
     /**

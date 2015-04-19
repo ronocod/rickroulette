@@ -42,9 +42,14 @@ import org.json.JSONObject;
 
 public class RickSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String LOG_TAG = RickSyncAdapter.class.getSimpleName();
-    public static final int SYNC_INTERVAL = (int) TimeUnit.HOURS.toSeconds(3);
+    public static final int SYNC_INTERVAL = (int) TimeUnit.DAYS.toSeconds(1);
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
     private static final int VIDEO_NOTIFICATION_ID = 3004;
+    private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/youtube/v3/videos?";
+    private static final String PARAM_PART = "part";
+    private static final String PARAM_CHART = "chart";
+    private static final String PARAM_MAX_RESULTS = "maxResults";
+    private static final String PARAM_KEY = "key";
 
 
     public RickSyncAdapter(Context context, boolean autoInitialize) {
@@ -87,16 +92,17 @@ public class RickSyncAdapter extends AbstractThreadedSyncAdapter {
          * Add the account and account type, no password or user data
          * If successful, return the Account object, otherwise report an error.
          */
-            if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
-                return null;
-            }
+            if (accountManager.addAccountExplicitly(newAccount, "", null)) {
             /*
              * If you don't set android:syncable="true" in
              * in your <provider> element in the manifest,
              * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
              * here.
              */
-            onAccountCreated(newAccount, context);
+                onAccountCreated(newAccount, context);
+            } else {
+                return null;
+            }
         }
         return newAccount;
     }
@@ -151,13 +157,6 @@ public class RickSyncAdapter extends AbstractThreadedSyncAdapter {
         BufferedReader reader = null;
 
         try {
-
-            final String YOUTUBE_BASE_URL =
-                    "https://www.googleapis.com/youtube/v3/videos?";
-            final String PARAM_PART = "part";
-            final String PARAM_CHART = "chart";
-            final String PARAM_MAX_RESULTS = "maxResults";
-            final String PARAM_KEY = "key";
 
             Uri builtUri = Uri.parse(YOUTUBE_BASE_URL).buildUpon()
                     .appendQueryParameter(PARAM_PART, "id,snippet")
